@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialSphere - Mini Social Media Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icon Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col antialiased transition-colors duration-200">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Platform Brand Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('feed')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                        <i class="fa-solid fa-share-nodes text-xl"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent">SocialSphere</span>
+                </div>
+
+                <!-- Main Desktop Navigation Tabs -->
+                <nav class="hidden md:flex space-x-1">
+                    <button onclick="navigateTo('feed')" id="nav-feed" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 bg-slate-100 dark:bg-slate-700 text-brand-600 dark:text-brand-400">
+                        <i class="fa-solid fa-house"></i> Feed
+                    </button>
+                    <button onclick="navigateTo('explore')" id="nav-explore" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                        <i class="fa-solid fa-compass"></i> Explore
+                    </button>
+                    <button onclick="navigateTo('profile')" id="nav-profile" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                        <i class="fa-solid fa-user"></i> Profile
+                    </button>
+                    <button onclick="navigateTo('architecture')" id="nav-architecture" class="nav-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
+                        <i class="fa-solid fa-code"></i> Backend Docs
+                    </button>
+                </nav>
+
+                <!-- Right Controls: Account Switcher & Dark Mode Toggle -->
+                <div class="flex items-center space-x-3">
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2 p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition border border-slate-200 dark:border-slate-700">
+                            <img id="current-user-avatar" src="" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+                            <span id="current-user-name" class="text-xs font-semibold hidden sm:inline-block pr-1">User</span>
+                            <i class="fa-solid fa-chevron-down text-xs text-slate-400 pr-1"></i>
+                        </button>
+                        <!-- Dynamic User Switcher Menu -->
+                        <div class="absolute right-0 mt-1 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 py-2 hidden group-hover:block z-50 animate-fadeIn">
+                            <div class="px-3 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Switch Account</div>
+                            <div id="user-switcher-list" class="divide-y divide-slate-100 dark:divide-slate-700/50">
+                                <!-- Dynamic List -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dark Mode Toggle Button -->
+                    <button id="theme-toggle" onclick="toggleTheme()" class="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:inline"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Bar -->
+        <div class="md:hidden flex justify-around border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-2 px-1">
+            <button onclick="navigateTo('feed')" class="flex flex-col items-center p-2 text-xs text-brand-600 font-medium">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span>Feed</span>
+            </button>
+            <button onclick="navigateTo('explore')" class="flex flex-col items-center p-2 text-xs text-slate-500">
+                <i class="fa-solid fa-compass text-lg"></i>
+                <span>Explore</span>
+            </button>
+            <button onclick="navigateTo('profile')" class="flex flex-col items-center p-2 text-xs text-slate-500">
+                <i class="fa-solid fa-user text-lg"></i>
+                <span>Profile</span>
+            </button>
+            <button onclick="navigateTo('architecture')" class="flex flex-col items-center p-2 text-xs text-indigo-500">
+                <i class="fa-solid fa-code text-lg"></i>
+                <span>Backend</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Application Area -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ==================== VIEW 1: FEED ==================== -->
+        <section id="view-feed" class="view-section grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Feed Stream Column -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Create Post Input Box -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-100 dark:border-slate-700/60">
+                    <div class="flex items-start space-x-3">
+                        <img id="create-post-avatar" src="" alt="Avatar" class="w-10 h-10 rounded-full object-cover mt-1">
+                        <div class="flex-grow">
+                            <textarea id="post-input-text" rows="3" placeholder="What's happening in your dev world?" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 resize-none transition-all dark:text-white" oninput="togglePostButton()"></textarea>
+                            
+                            <!-- Image URL Preview Container -->
+                            <div id="image-url-preview-container" class="hidden mt-2 relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 max-h-48">
+                                <img id="image-url-preview" src="" class="w-full h-48 object-cover" onerror="this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Invalid+Image+URL'">
+                                <button onclick="clearPostImage()" class="absolute top-2 right-2 bg-slate-900/70 text-white rounded-full p-1.5 w-7 h-7 flex items-center justify-center hover:bg-slate-900 transition">
+                                    <i class="fa-solid fa-xmark text-xs"></i>
+                                </button>
+                            </div>
+
+                            <!-- Optional Image URL Input -->
+                            <div id="image-url-input-wrap" class="hidden mt-2">
+                                <input type="url" id="post-image-url" placeholder="Paste Image URL (e.g. https://images.unsplash.com/...)" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-brand-500" oninput="previewPostImage()">
+                            </div>
+
+                            <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+                                <button onclick="toggleImageUrlInput()" class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50 transition">
+                                    <i class="fa-regular fa-image text-brand-500"></i>
+                                    <span>Attach Image</span>
+                                </button>
+                                <button id="submit-post-btn" onclick="createNewPost()" disabled class="bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-5 py-2 rounded-xl text-sm transition-colors shadow-sm flex items-center gap-2">
+                                    <span>Post</span>
+                                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feed Stream Posts Area -->
+                <div id="feed-posts-container" class="space-y-5">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Feed Sidebar Column -->
+            <div class="space-y-6">
+                <!-- User Profile Mini Sidebar Card -->
+                <div id="sidebar-user-card" class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700/60">
+                    <!-- Injected via JS -->
+                </div>
+
+                <!-- Suggested Users to Follow -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700/60">
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-brand-500"></i> Suggested Connections
+                    </h3>
+                    <div id="suggested-users-list" class="space-y-4">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 2: PROFILE ==================== -->
+        <section id="view-profile" class="view-section hidden max-w-4xl mx-auto space-y-6">
+            <!-- Profile Banner & Main Info -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/60 overflow-hidden">
+                <div class="h-32 sm:h-48 bg-gradient-to-r from-brand-500 via-purple-500 to-indigo-600 relative"></div>
+                
+                <div class="px-6 pb-6 relative">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between -mt-16 sm:-mt-20 mb-4 space-y-4 sm:space-y-0">
+                        <div class="flex items-end space-x-4">
+                            <img id="profile-view-avatar" src="" class="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl border-4 border-white dark:border-slate-800 object-cover shadow-md bg-white">
+                            <div class="mb-2">
+                                <h2 id="profile-view-name" class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Loading...</h2>
+                                <p id="profile-view-handle" class="text-sm text-slate-500 dark:text-slate-400">@username</p>
+                            </div>
+                        </div>
+
+                        <!-- Action Controls (Edit Profile or Follow Button) -->
+                        <div id="profile-action-btn-container" class="flex gap-2">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+
+                    <!-- Bio Text -->
+                    <p id="profile-view-bio" class="text-sm text-slate-600 dark:text-slate-300 mb-5 max-w-2xl leading-relaxed">
+                        No bio specified yet.
+                    </p>
+
+                    <!-- Real-time Dynamic Stats -->
+                    <div class="flex items-center gap-6 border-t border-b border-slate-100 dark:border-slate-700/60 py-3 text-sm">
+                        <div>
+                            <span id="profile-stat-posts" class="font-bold text-slate-900 dark:text-white">0</span>
+                            <span class="text-slate-500 dark:text-slate-400 text-xs ml-1">Posts</span>
+                        </div>
+                        <div>
+                            <span id="profile-stat-followers" class="font-bold text-slate-900 dark:text-white">0</span>
+                            <span class="text-slate-500 dark:text-slate-400 text-xs ml-1">Followers</span>
+                        </div>
+                        <div>
+                            <span id="profile-stat-following" class="font-bold text-slate-900 dark:text-white">0</span>
+                            <span class="text-slate-500 dark:text-slate-400 text-xs ml-1">Following</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Posts Sub-feed -->
+            <div class="space-y-4">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <i class="fa-regular fa-newspaper text-brand-500"></i> User Activity & Posts
+                </h3>
+                <div id="profile-posts-container" class="space-y-5">
+                    <!-- Posts list -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 3: EXPLORE ==================== -->
+        <section id="view-explore" class="view-section hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/60 shadow-sm">
+                <h2 class="text-xl font-bold mb-2">Explore Community</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Discover and connect with developers across the network.</p>
+            </div>
+
+            <div id="explore-users-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- User Cards Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 4: ARCHITECTURE & BACKEND DOCS ==================== -->
+        <section id="view-architecture" class="view-section hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/60 shadow-sm">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="p-2.5 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400">
+                        <i class="fa-solid fa-server text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold">Backend Architecture & REST API Docs</h2>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Reference implementations for Express.js, Django REST Framework, and SQL/NoSQL Database Schemas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backend Framework Tabs -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700/60 shadow-sm overflow-hidden">
+                <div class="flex flex-wrap border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+                    <button onclick="switchArchTab('express')" id="arch-tab-express" class="arch-tab-btn px-6 py-3.5 text-sm font-medium border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+                        <i class="fa-brands fa-node-js text-emerald-500"></i> Express.js + Prisma
+                    </button>
+                    <button onclick="switchArchTab('django')" id="arch-tab-django" class="arch-tab-btn px-6 py-3.5 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-2">
+                        <i class="fa-brands fa-python text-amber-500"></i> Django REST Framework
+                    </button>
+                    <button onclick="switchArchTab('schema')" id="arch-tab-schema" class="arch-tab-btn px-6 py-3.5 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-2">
+                        <i class="fa-solid fa-database text-brand-500"></i> PostgreSQL / Mongo Schemas
+                    </button>
+                    <button onclick="switchArchTab('endpoints')" id="arch-tab-endpoints" class="arch-tab-btn px-6 py-3.5 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-2">
+                        <i class="fa-solid fa-network-wired text-sky-500"></i> REST API Specs
+                    </button>
+                </div>
+
+                <!-- Express Code Panel -->
+                <div id="arch-content-express" class="p-6 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200">Express.js Route Controllers (`routes/api.js`)</h3>
+                        <span class="text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-mono px-2.5 py-1 rounded-md">Node.js / Express</span>
+                    </div>
+                    <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl overflow-x-auto text-xs font-mono leading-relaxed custom-scrollbar"><code>const express = require('express');
+const router = express.Router();
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+// GET /api/posts - Fetch feed with author details, likes & comments count
+router.get('/posts', async (req, res) => {
+  try {
+    const posts = await prisma.post.findMany({
+      include: {
+        author: { select: { id: true, name: true, username: true, avatar: true } },
+        likes: true,
+        comments: { include: { author: { select: { name: true, avatar: true } } } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/posts/:id/like - Toggle post like
+router.post('/posts/:id/like', async (req, res) => {
+  const { userId } = req.body;
+  const postId = req.params.id;
+  const existingLike = await prisma.like.findUnique({
+    where: { userId_postId: { userId, postId } }
+  });
+
+  if (existingLike) {
+    await prisma.like.delete({ where: { userId_postId: { userId, postId } } });
+    return res.json({ liked: false });
+  }
+  await prisma.like.create({ data: { userId, postId } });
+  res.json({ liked: true });
+});
+
+module.exports = router;</code></pre>
+                </div>
+
+                <!-- Django Code Panel -->
+                <div id="arch-content-django" class="p-6 space-y-4 hidden">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200">Django ViewSets (`views.py`)</h3>
+                        <span class="text-xs bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-mono px-2.5 py-1 rounded-md">Python / DRF</span>
+                    </div>
+                    <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl overflow-x-auto text-xs font-mono leading-relaxed custom-scrollbar"><code>from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Post, Comment, Follow
+from .serializers import PostSerializer, CommentSerializer
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all().order_by('-created_at')
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    @action(detail=True, methods=['post'])
+    def like(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        if post.likes.filter(id=user.id).exists():
+            post.likes.remove(user)
+            return Response({'liked': False})
+        post.likes.add(user)
+        return Response({'liked': True})
+
+    @action(detail=True, methods=['post'])
+    def comment(self, request, pk=None):
+        post = self.get_object()
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(author=request.user, post=post)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)</code></pre>
+                </div>
+
+                <!-- Schema Code Panel -->
+                <div id="arch-content-schema" class="p-6 space-y-4 hidden">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-200">PostgreSQL Relational Schema (DDL)</h3>
+                    <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl overflow-x-auto text-xs font-mono leading-relaxed custom-scrollbar"><code>CREATE TABLE users (
+    id VARCHAR(50) PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    avatar TEXT,
+    bio TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE posts (
+    id VARCHAR(50) PRIMARY KEY,
+    author_id VARCHAR(50) REFERENCES users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    image_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE post_likes (
+    user_id VARCHAR(50) REFERENCES users(id) ON DELETE CASCADE,
+    post_id VARCHAR(50) REFERENCES posts(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, post_id)
+);
+
+CREATE TABLE follows (
+    follower_id VARCHAR(50) REFERENCES users(id) ON DELETE CASCADE,
+    following_id VARCHAR(50) REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (follower_id, following_id)
+);</code></pre>
+                </div>
+
+                <!-- API Endpoints Docs Panel -->
+                <div id="arch-content-endpoints" class="p-6 space-y-4 hidden">
+                    <h3 class="font-bold text-slate-800 dark:text-slate-200">REST API Specification Matrix</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-200">
+                                    <th class="p-2.5 border border-slate-200 dark:border-slate-700">HTTP Method</th>
+                                    <th class="p-2.5 border border-slate-200 dark:border-slate-700">Endpoint</th>
+                                    <th class="p-2.5 border border-slate-200 dark:border-slate-700">Description</th>
+                                    <th class="p-2.5 border border-slate-200 dark:border-slate-700">Request Body</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-700 text-slate-600 dark:text-slate-300">
+                                <tr>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-bold text-emerald-600">GET</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-mono">/api/posts</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700">Get all feed posts</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-mono">None</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-bold text-sky-600">POST</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-mono">/api/posts</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700">Create new post</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-mono">{ authorId, content, imageUrl }</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-bold text-sky-600">POST</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-mono">/api/posts/:id/like</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700">Toggle like on post</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-mono">{ userId }</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-bold text-sky-600">POST</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-mono">/api/users/:id/follow</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700">Follow/Unfollow user</td>
+                                    <td class="p-2.5 border border-slate-200 dark:border-slate-700 font-mono">{ currentUserId }</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for Editing User Profile -->
+    <div id="edit-profile-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full mx-4 p-6 shadow-2xl border border-slate-100 dark:border-slate-700 transform scale-95 transition-transform duration-200">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-700">
+                <h3 class="text-lg font-bold">Edit Profile</h3>
+                <button onclick="closeEditProfileModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4 py-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Full Name</label>
+                    <input type="text" id="edit-name" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Avatar Image URL</label>
+                    <input type="url" id="edit-avatar" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Bio</label>
+                    <textarea id="edit-bio" rows="3" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"></textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="closeEditProfileModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Cancel</button>
+                <button onclick="saveProfileChanges()" class="px-5 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white hover:bg-brand-700 transition">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default Mock Dataset
+        const DEFAULT_USERS = [
+            {
+                id: 'usr_1',
+                username: 'alex_dev',
+                name: 'Alex Rivera',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+                bio: 'Full-stack developer building modern web applications. Tech enthusiast & open-source contributor 🚀'
+            },
+            {
+                id: 'usr_2',
+                username: 'sarah_design',
+                name: 'Sarah Chen',
+                avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+                bio: 'UI/UX Designer creating delightful digital experiences. Coffee lover & photographer 🎨✨'
+            },
+            {
+                id: 'usr_3',
+                username: 'marcus_tech',
+                name: 'Marcus Vance',
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+                bio: 'AI researcher & Python wizard. Exploring LLMs and distributed systems 🤖'
+            }
+        ];
+
+        const DEFAULT_POSTS = [
+            {
+                id: 'post_1',
+                authorId: 'usr_2',
+                content: 'Just finished redesigning our dashboard UI! Focused on subtle micro-interactions and dark mode readability. What do you think? 🎨',
+                imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
+                createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+                likes: ['usr_1', 'usr_3'],
+                comments: [
+                    { id: 'c_1', authorId: 'usr_1', content: 'Looks super clean! Love the subtle gradients.', createdAt: new Date(Date.now() - 1000 * 60 * 20).toISOString() }
+                ]
+            },
+            {
+                id: 'post_2',
+                authorId: 'usr_1',
+                content: 'Building a mini social media platform with pure HTML, Tailwind, and JavaScript! Everything updates dynamically and syncs to LocalStorage. 💻⚡',
+                imageUrl: '',
+                createdAt: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
+                likes: ['usr_2'],
+                comments: [
+                    { id: 'c_2', authorId: 'usr_3', content: 'Great architecture design! Really well structured.', createdAt: new Date(Date.now() - 1000 * 60 * 100).toISOString() }
+                ]
+            }
+        ];
+
+        const DEFAULT_FOLLOWS = [
+            { followerId: 'usr_1', followingId: 'usr_2' },
+            { followerId: 'usr_2', followingId: 'usr_1' },
+            { followerId: 'usr_3', followingId: 'usr_1' }
+        ];
+
+        // Central State Manager
+        let state = {
+            currentUserId: 'usr_1',
+            viewedUserId: 'usr_1',
+            users: [],
+            posts: [],
+            follows: [],
+            currentView: 'feed'
+        };
+
+        // App Initialization
+        function initApp() {
+            loadFromStorage();
+            renderCurrentUserUI();
+            renderFeed();
+            renderSuggestedUsers();
+            renderExploreUsers();
+            setupTheme();
+        }
+
+        function loadFromStorage() {
+            const savedUsers = localStorage.getItem('ss_users');
+            const savedPosts = localStorage.getItem('ss_posts');
+            const savedFollows = localStorage.getItem('ss_follows');
+            const savedCurrentUserId = localStorage.getItem('ss_current_user');
+
+            state.users = savedUsers ? JSON.parse(savedUsers) : DEFAULT_USERS;
+            state.posts = savedPosts ? JSON.parse(savedPosts) : DEFAULT_POSTS;
+            state.follows = savedFollows ? JSON.parse(savedFollows) : DEFAULT_FOLLOWS;
+            state.currentUserId = savedCurrentUserId || 'usr_1';
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('ss_users', JSON.stringify(state.users));
+            localStorage.setItem('ss_posts', JSON.stringify(state.posts));
+            localStorage.setItem('ss_follows', JSON.stringify(state.follows));
+            localStorage.setItem('ss_current_user', state.currentUserId);
+        }
+
+        function getCurrentUser() {
+            return state.users.find(u => u.id === state.currentUserId) || state.users[0];
+        }
+
+        function getUserById(id) {
+            return state.users.find(u => u.id === id) || { name: 'Unknown User', avatar: '', username: 'unknown' };
+        }
+
+        function timeAgo(dateString) {
+            const now = new Date();
+            const past = new Date(dateString);
+            const seconds = Math.floor((now - past) / 1000);
+
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            return `${days}d ago`;
+        }
+
+        // View Navigation Logic
+        function navigateTo(viewName, targetUserId = null) {
+            state.currentView = viewName;
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            
+            const selectedView = document.getElementById(`view-${viewName}`);
+            if (selectedView) selectedView.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.className = "nav-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700";
+            });
+
+            const activeNav = document.getElementById(`nav-${viewName}`);
+            if (activeNav) {
+                if (viewName === 'architecture') {
+                    activeNav.className = "nav-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800";
+                } else {
+                    activeNav.className = "nav-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 bg-slate-100 dark:bg-slate-700 text-brand-600 dark:text-brand-400";
+                }
+            }
+
+            if (viewName === 'profile') {
+                state.viewedUserId = targetUserId || state.currentUserId;
+                renderProfileView();
+            } else if (viewName === 'feed') {
+                renderFeed();
+                renderSuggestedUsers();
+            } else if (viewName === 'explore') {
+                renderExploreUsers();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Switch Active Account
+        function switchAccount(userId) {
+            state.currentUserId = userId;
+            saveToStorage();
+            renderCurrentUserUI();
+            
+            if (state.currentView === 'feed') {
+                renderFeed();
+                renderSuggestedUsers();
+            } else if (state.currentView === 'profile') {
+                renderProfileView();
+            } else if (state.currentView === 'explore') {
+                renderExploreUsers();
+            }
+        }
+
+        function renderCurrentUserUI() {
+            const user = getCurrentUser();
+            
+            document.getElementById('current-user-avatar').src = user.avatar;
+            document.getElementById('current-user-name').innerText = user.name;
+            document.getElementById('create-post-avatar').src = user.avatar;
+
+            const switcherList = document.getElementById('user-switcher-list');
+            switcherList.innerHTML = state.users.map(u => `
+                <button onclick="switchAccount('${u.id}')" class="w-full text-left px-3 py-2 flex items-center space-x-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition ${u.id === state.currentUserId ? 'bg-indigo-50/50 dark:bg-indigo-950/30' : ''}">
+                    <img src="${u.avatar}" class="w-7 h-7 rounded-full object-cover">
+                    <div class="flex-grow truncate">
+                        <div class="text-xs font-semibold ${u.id === state.currentUserId ? 'text-brand-600 dark:text-brand-400' : 'text-slate-800 dark:text-slate-200'}">${u.name}</div>
+                        <div class="text-[10px] text-slate-400">@${u.username}</div>
+                    </div>
+                    ${u.id === state.currentUserId ? '<i class="fa-solid fa-check text-xs text-brand-600"></i>' : ''}
+                </button>
+            `).join('');
+
+            const sidebarCard = document.getElementById('sidebar-user-card');
+            const followersCount = state.follows.filter(f => f.followingId === user.id).length;
+            const followingCount = state.follows.filter(f => f.followerId === user.id).length;
+
+            sidebarCard.innerHTML = `
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('profile', '${user.id}')">
+                    <img src="${user.avatar}" class="w-12 h-12 rounded-full object-cover border border-slate-100 dark:border-slate-700">
+                    <div class="flex-grow min-w-0">
+                        <h4 class="font-bold text-sm text-slate-900 dark:text-white truncate">${user.name}</h4>
+                        <p class="text-xs text-slate-500 truncate">@${user.username}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 text-center text-xs">
+                    <div>
+                        <span class="block font-bold text-slate-900 dark:text-white text-sm">${followersCount}</span>
+                        <span class="text-slate-400">Followers</span>
+                    </div>
+                    <div>
+                        <span class="block font-bold text-slate-900 dark:text-white text-sm">${followingCount}</span>
+                        <span class="text-slate-400">Following</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Posts Creation Mechanics
+        function togglePostButton() {
+            const text = document.getElementById('post-input-text').value.trim();
+            document.getElementById('submit-post-btn').disabled = text.length === 0;
+        }
+
+        function toggleImageUrlInput() {
+            document.getElementById('image-url-input-wrap').classList.toggle('hidden');
+        }
+
+        function previewPostImage() {
+            const url = document.getElementById('post-image-url').value.trim();
+            const container = document.getElementById('image-url-preview-container');
+            const img = document.getElementById('image-url-preview');
+            
+            if (url) {
+                img.src = url;
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function clearPostImage() {
+            document.getElementById('post-image-url').value = '';
+            document.getElementById('image-url-preview-container').classList.add('hidden');
+        }
+
+        function createNewPost() {
+            const content = document.getElementById('post-input-text').value.trim();
+            const imageUrl = document.getElementById('post-image-url').value.trim();
+
+            if (!content) return;
+
+            const newPost = {
+                id: 'post_' + Date.now(),
+                authorId: state.currentUserId,
+                content: content,
+                imageUrl: imageUrl,
+                createdAt: new Date().toISOString(),
+                likes: [],
+                comments: []
+            };
+
+            state.posts.unshift(newPost);
+            saveToStorage();
+
+            document.getElementById('post-input-text').value = '';
+            clearPostImage();
+            document.getElementById('image-url-input-wrap').classList.add('hidden');
+            togglePostButton();
+
+            renderFeed();
+        }
+
+        // Render Feed Posts
+        function renderFeed() {
+            const container = document.getElementById('feed-posts-container');
+            if (state.posts.length === 0) {
+                container.innerHTML = `<div class="bg-white dark:bg-slate-800 rounded-2xl p-8 text-center text-slate-500">No posts in feed yet. Create one above!</div>`;
+                return;
+            }
+
+            container.innerHTML = state.posts.map(post => createPostHTML(post)).join('');
+        }
+
+        function createPostHTML(post) {
+            const author = getUserById(post.authorId);
+            const isLiked = post.likes.includes(state.currentUserId);
+            const likesCount = post.likes.length;
+
+            return `
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-700/60 transition-all hover:border-slate-200 dark:hover:border-slate-700">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('profile', '${author.id}')">
+                            <img src="${author.avatar}" class="w-10 h-10 rounded-full object-cover border border-slate-100 dark:border-slate-700">
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-900 dark:text-white hover:text-brand-600 transition">${author.name}</h4>
+                                <p class="text-xs text-slate-400">@${author.username} • ${timeAgo(post.createdAt)}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-sm text-slate-700 dark:text-slate-200 leading-relaxed mb-3 whitespace-pre-line">${escapeHTML(post.content)}</p>
+
+                    ${post.imageUrl ? `
+                        <div class="mb-4 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 max-h-96 bg-slate-100 dark:bg-slate-900">
+                            <img src="${post.imageUrl}" class="w-full h-auto object-cover max-h-96" loading="lazy" onerror="this.src='https://placehold.co/800x400/e2e8f0/64748b?text=Image+Unavailable'">
+                        </div>
+                    ` : ''}
+
+                    <div class="flex items-center space-x-6 pt-2 text-xs border-t border-slate-100 dark:border-slate-700/60">
+                        <button onclick="toggleLike('${post.id}')" class="flex items-center space-x-1.5 font-medium ${isLiked ? 'text-rose-500 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-rose-500'} transition">
+                            <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart text-sm"></i>
+                            <span>${likesCount}</span>
+                        </button>
+
+                        <div class="flex items-center space-x-1.5 font-medium text-slate-500 dark:text-slate-400">
+                            <i class="fa-regular fa-comment text-sm"></i>
+                            <span>${post.comments.length} Comments</span>
+                        </div>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div id="comments-sec-${post.id}" class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/40 space-y-3">
+                        <div class="flex gap-2">
+                            <input type="text" id="comment-input-${post.id}" placeholder="Write a reply..." class="flex-grow bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-brand-500 dark:text-white" onkeypress="if(event.key==='Enter') addComment('${post.id}')">
+                            <button onclick="addComment('${post.id}')" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-medium transition">
+                                Send
+                            </button>
+                        </div>
+
+                        <div class="space-y-2.5 max-h-60 overflow-y-auto custom-scrollbar">
+                            ${post.comments.map(c => {
+                                const cAuthor = getUserById(c.authorId);
+                                return `
+                                    <div class="flex space-x-2.5 text-xs bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+                                        <img src="${cAuthor.avatar}" class="w-6 h-6 rounded-full object-cover mt-0.5">
+                                        <div class="flex-grow">
+                                            <div class="flex items-center justify-between mb-0.5">
+                                                <span class="font-bold text-slate-800 dark:text-slate-200">${cAuthor.name}</span>
+                                                <span class="text-[10px] text-slate-400">${timeAgo(c.createdAt)}</span>
+                                            </div>
+                                            <p class="text-slate-600 dark:text-slate-300 leading-snug">${escapeHTML(c.content)}</p>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Likes & Comments Logic
+        function toggleLike(postId) {
+            const post = state.posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const idx = post.likes.indexOf(state.currentUserId);
+            if (idx > -1) {
+                post.likes.splice(idx, 1);
+            } else {
+                post.likes.push(state.currentUserId);
+            }
+
+            saveToStorage();
+            refreshCurrentViewPosts();
+        }
+
+        function addComment(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            const content = input.value.trim();
+            if (!content) return;
+
+            const post = state.posts.find(p => p.id === postId);
+            if (!post) return;
+
+            post.comments.push({
+                id: 'c_' + Date.now(),
+                authorId: state.currentUserId,
+                content: content,
+                createdAt: new Date().toISOString()
+            });
+
+            saveToStorage();
+            refreshCurrentViewPosts();
+        }
+
+        function refreshCurrentViewPosts() {
+            if (state.currentView === 'feed') renderFeed();
+            else if (state.currentView === 'profile') renderProfileView();
+        }
+
+        // Follow System Logic
+        function toggleFollow(targetUserId) {
+            if (targetUserId === state.currentUserId) return;
+
+            const existingIdx = state.follows.findIndex(
+                f => f.followerId === state.currentUserId && f.followingId === targetUserId
+            );
+
+            if (existingIdx > -1) {
+                state.follows.splice(existingIdx, 1);
+            } else {
+                state.follows.push({
+                    followerId: state.currentUserId,
+                    followingId: targetUserId
+                });
+            }
+
+            saveToStorage();
+            renderCurrentUserUI();
+            
+            if (state.currentView === 'feed') renderSuggestedUsers();
+            if (state.currentView === 'explore') renderExploreUsers();
+            if (state.currentView === 'profile') renderProfileView();
+        }
+
+        function isFollowing(targetUserId) {
+            return state.follows.some(f => f.followerId === state.currentUserId && f.followingId === targetUserId);
+        }
+
+        function renderSuggestedUsers() {
+            const list = document.getElementById('suggested-users-list');
+            const suggestions = state.users.filter(u => u.id !== state.currentUserId);
+
+            list.innerHTML = suggestions.map(u => {
+                const following = isFollowing(u.id);
+                return `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2.5 cursor-pointer min-w-0" onclick="navigateTo('profile', '${u.id}')">
+                            <img src="${u.avatar}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                            <div class="truncate">
+                                <h5 class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${u.name}</h5>
+                                <p class="text-[10px] text-slate-400 truncate">@${u.username}</p>
+                            </div>
+                        </div>
+                        <button onclick="toggleFollow('${u.id}')" class="px-3 py-1 rounded-lg text-xs font-semibold transition ${following ? 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' : 'bg-brand-50 text-brand-600 hover:bg-brand-100 dark:bg-brand-950/50 dark:text-brand-400'}">
+                            ${following ? 'Following' : 'Follow'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Profile View Generator
+        function renderProfileView() {
+            const user = getUserById(state.viewedUserId);
+            const isSelf = user.id === state.currentUserId;
+            const following = isFollowing(user.id);
+
+            document.getElementById('profile-view-avatar').src = user.avatar;
+            document.getElementById('profile-view-name').innerText = user.name;
+            document.getElementById('profile-view-handle').innerText = `@${user.username}`;
+            document.getElementById('profile-view-bio').innerText = user.bio || 'No bio specified.';
+
+            const userPosts = state.posts.filter(p => p.authorId === user.id);
+            const followers = state.follows.filter(f => f.followingId === user.id);
+            const followingList = state.follows.filter(f => f.followerId === user.id);
+
+            document.getElementById('profile-stat-posts').innerText = userPosts.length;
+            document.getElementById('profile-stat-followers').innerText = followers.length;
+            document.getElementById('profile-stat-following').innerText = followingList.length;
+
+            const btnContainer = document.getElementById('profile-action-btn-container');
+            if (isSelf) {
+                btnContainer.innerHTML = `
+                    <button onclick="openEditProfileModal()" class="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                        <i class="fa-solid fa-pen text-slate-400 mr-1"></i> Edit Profile
+                    </button>
+                `;
+            } else {
+                btnContainer.innerHTML = `
+                    <button onclick="toggleFollow('${user.id}')" class="px-5 py-2 rounded-xl text-xs font-semibold transition ${following ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200' : 'bg-brand-600 text-white hover:bg-brand-700'}">
+                        ${following ? 'Following' : 'Follow'}
+                    </button>
+                `;
+            }
+
+            const profilePostsContainer = document.getElementById('profile-posts-container');
+            if (userPosts.length === 0) {
+                profilePostsContainer.innerHTML = `<div class="bg-white dark:bg-slate-800 rounded-2xl p-8 text-center text-slate-500 text-sm">No posts published yet.</div>`;
+            } else {
+                profilePostsContainer.innerHTML = userPosts.map(post => createPostHTML(post)).join('');
+            }
+        }
+
+        // Profile Edit Dialog
+        function openEditProfileModal() {
+            const user = getCurrentUser();
+            document.getElementById('edit-name').value = user.name;
+            document.getElementById('edit-avatar').value = user.avatar;
+            document.getElementById('edit-bio').value = user.bio || '';
+
+            const modal = document.getElementById('edit-profile-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeEditProfileModal() {
+            const modal = document.getElementById('edit-profile-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+
+        function saveProfileChanges() {
+            const user = getCurrentUser();
+            const name = document.getElementById('edit-name').value.trim();
+            const avatar = document.getElementById('edit-avatar').value.trim();
+            const bio = document.getElementById('edit-bio').value.trim();
+
+            if (name) user.name = name;
+            if (avatar) user.avatar = avatar;
+            user.bio = bio;
+
+            saveToStorage();
+            renderCurrentUserUI();
+            renderProfileView();
+            closeEditProfileModal();
+        }
+
+        // Explore Page Generator
+        function renderExploreUsers() {
+            const grid = document.getElementById('explore-users-grid');
+            grid.innerHTML = state.users.map(u => {
+                const isSelf = u.id === state.currentUserId;
+                const following = isFollowing(u.id);
+                const userPosts = state.posts.filter(p => p.authorId === u.id);
+
+                return `
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-100 dark:border-slate-700/60 shadow-sm flex flex-col justify-between items-center text-center">
+                        <img src="${u.avatar}" class="w-20 h-20 rounded-full object-cover border-2 border-slate-100 dark:border-slate-700 mb-3 cursor-pointer" onclick="navigateTo('profile', '${u.id}')">
+                        <h4 class="font-bold text-slate-900 dark:text-white cursor-pointer hover:text-brand-600" onclick="navigateTo('profile', '${u.id}')">${u.name}</h4>
+                        <p class="text-xs text-slate-400 mb-2">@${u.username}</p>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 mb-4 line-clamp-2 px-2">${u.bio || 'No bio specified.'}</p>
+                        
+                        <div class="w-full pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
+                            <span class="text-xs text-slate-400 font-medium">${userPosts.length} posts</span>
+                            ${!isSelf ? `
+                                <button onclick="toggleFollow('${u.id}')" class="px-4 py-1.5 rounded-xl text-xs font-semibold transition ${following ? 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' : 'bg-brand-600 text-white hover:bg-brand-700'}">
+                                    ${following ? 'Following' : 'Follow'}
+                                </button>
+                            ` : '<span class="text-xs text-brand-600 font-semibold">(You)</span>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Switch Architectural Code Tabs
+        function switchArchTab(tab) {
+            document.querySelectorAll('.arch-tab-btn').forEach(btn => {
+                btn.className = "arch-tab-btn px-6 py-3.5 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-2";
+            });
+
+            document.getElementById(`arch-tab-${tab}`).className = "arch-tab-btn px-6 py-3.5 text-sm font-medium border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 flex items-center gap-2";
+
+            document.getElementById('arch-content-express').classList.add('hidden');
+            document.getElementById('arch-content-django').classList.add('hidden');
+            document.getElementById('arch-content-schema').classList.add('hidden');
+            document.getElementById('arch-content-endpoints').classList.add('hidden');
+
+            document.getElementById(`arch-content-${tab}`).classList.remove('hidden');
+        }
+
+        // Theme Support
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('ss_theme', isDark ? 'dark' : 'light');
+        }
+
+        function setupTheme() {
+            const savedTheme = localStorage.getItem('ss_theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
